@@ -1,0 +1,197 @@
+version: '2'
+
+volumes: {mysql: null}
+
+networks:
+  static-network:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+          ip_range: 172.20.0.0/24
+
+services:
+    gitlab:
+        image: 'gitlab/gitlab-ce:latest' #better use some stable release
+        build: {context: ., dockerfile: config/dockerfiles/gitlab.conf}
+        container_name: gitlab
+        restart: always
+        hostname: 'git.pepeperadio.com'
+        environment:
+          GITLAB_OMNIBUS_CONFIG: |
+            external_url 'https://git.pepeperadio.com'
+          IMAP_USER: git.pepepe@pppp.com
+          IMAP_PASS: zzzzzzzzzzzzzzzzzzz
+            # Add any other gitlab.rb configuration here, each on its own line
+        ports:
+          - 'xxx.xxx.xxx.125:80:80'
+          - 'xxx.xxx.xxx.125:443:443'
+          - 'xxx.xxx.xxx.125:22:22'
+        volumes:
+          - '/srv/gitlab/config:/etc/gitlab'
+          - '/srv/gitlab/loomg:/var/log/gitlab'
+          - '/srv/gitlab/data:/var/opt/gitlab'
+          - '/var/www/letsencrypt:/var/www/letsencrypt'
+        networks:
+            static-network:
+                ipv4_address: 172.20.0.2
+
+    nginx:
+        build: {context: ., dockerfile: config/dockerfiles/nginx.conf}
+        container_name: nginx
+        ports:
+          - "xxx.xxx.xxx.118:80:80"
+          - "xxx.xxx.xxx.118:443:443"
+          - "xxx.xxx.xxx.118:10021:22"
+        volumes:
+            - /opt/nginx/nginx:/etc/nginx
+            - /etc/letsencrypt:/etc/letsencrypt:ro
+            - /var/www/omg.pepeperadio.com:/var/www/omg.pepeperadio.com:ro
+            - /var/www/omg-dev.pepeperadio.com:/var/www/omg-dev.pepeperadio.com:ro
+            - /var/www/znnsnsns.com:/var/www/znnsnsns.com:ro
+            - /var/www/znnsnsnstest.com:/var/www/znnsnsnstest.com:ro
+            - /var/www/nope.com:/var/www/nope.com:ro
+            - /var/www/nope-v2.com:/var/www/nope-v2.com:ro
+            - /var/www/fffffuuuuu-asia.com:/var/www/fffffuuuuu-asia.com:ro
+            - /var/www/fffffuuuuudev.pepeperadio.com:/var/www/fffffuuuuudev.pepeperadio.com:ro
+            - /var/www/gztar.com:/var/www/gztar.com:ro
+            - /var/www/nope.com.hk:/var/www/nope.com.hk:ro
+            - /var/www/c3po.pepeperadio.com:/var/www/c3po.pepeperadio.com:ro
+            - /var/www/omg-navigation.pepeperadio.com:/var/www/omg-navigation.pepeperadio.com:ro
+            - /var/www/wenot.pepeperadio.com:/var/www/wenot.pepeperadio.com
+            - /var/www/dev-wenot.pepeperadio.com:/var/www/dev-wenot.pepeperadio.com
+        networks:
+            static-network:
+                ipv4_address: 172.20.0.3
+        restart: always
+
+    db:
+        container_name: mysql
+        environment: {MYSQL_ROOT_PASSWORD: yupthisismypass}
+        expose: ['3306']
+        image: mysql:5.7
+        ports: ['3306:3306']
+        volumes:
+            - mysql:/var/lib/mysql
+            - /var/www/mysql:/dumps
+        networks:
+            static-network:
+                ipv4_address: 172.20.0.4
+        restart: always
+
+    pma:
+        container_name: pma
+        image: phpmyadmin/phpmyadmin
+        environment:
+             - PMA_ABSOLUTE_URI=http://pma-pepepe.noooooooooooooooooo.cc/
+             - PMA_HOSTS=172.20.0.4,db
+             - PMA_USER=root
+             - PMA_PASSWORD=alsssssssssssssssssssonope
+        networks:
+            static-network:
+                ipv4_address: 172.20.0.11
+        restart: always
+
+    omg:
+        build: {context: ., dockerfile: config/dockerfiles/omg.conf}
+        container_name: omg
+        depends_on: [db]
+        expose: ['9000']
+        networks:
+            static-network:
+                ipv4_address: 172.20.0.5
+        ports: ['xxx.xxx.xxx.118:10023:22']
+        volumes:
+            - /var/www/omg.pepeperadio.com:/var/www/omg.pepeperadio.com
+            - /var/www/omg-dev.pepeperadio.com:/var/www/omg-dev.pepeperadio.com
+            - /var/www/omg-navigation.pepeperadio.com:/var/www/omg-navigation.pepeperadio.com
+            - /opt/gitlab-runners/omg/:/etc/gitlab-runner
+        restart: always
+
+    oldomg:
+        build: {context: ., dockerfile: config/dockerfiles/oldomg.conf}
+        container_name: oldomg
+        depends_on: [db]
+        expose: ['9000']
+        networks:
+            static-network:
+                ipv4_address: 172.20.0.6
+        ports: ['xxx.xxx.xxx.118:10024:22']
+        volumes:
+            - /var/www/znnsnsns.com:/var/www/znnsnsns.com
+            - /var/www/znnsnsnstest.com:/var/www/znnsnsnstest.com
+            - /opt/gitlab-runners/oldomg/:/etc/gitlab-runner
+        restart: always
+
+    nope:
+        build: {context: ., dockerfile: config/dockerfiles/nope.conf}
+        container_name: nope
+        depends_on: [db]
+        expose: ['9000']
+        networks:
+            static-network:
+                ipv4_address: 172.20.0.7
+        ports: ['xxx.xxx.xxx.118:10025:22']
+        volumes:
+            - /var/www/nope.com:/var/www/nope.com
+            - /var/www/nope-v2.com:/var/www/nope-v2.com
+            - /var/www/nope.com.hk:/var/www/nope.com.hk
+            - /opt/gitlab-runners/nope/:/etc/gitlab-runner
+        restart: always
+
+    fffffuuuuu:
+        build: {context: ., dockerfile: config/dockerfiles/fffffuuuuu.conf}
+        container_name: fffffuuuuu
+        depends_on: [db]
+        expose: ['9000']
+        networks:
+            static-network:
+                ipv4_address: 172.20.0.8
+        ports: ['xxx.xxx.xxx.118:10026:22']
+        volumes:
+            - /var/www/fffffuuuuu-asia.com:/var/www/fffffuuuuu-asia.com
+            - /var/www/fffffuuuuudev.pepeperadio.com:/var/www/fffffuuuuudev.pepeperadio.com
+            - /opt/gitlab-runners/fffffuuuuu/:/etc/gitlab-runner
+        restart: always
+
+    gztar:
+        build: {context: ., dockerfile: config/dockerfiles/gztar.conf}
+        container_name: gztar
+        depends_on: [db]
+        expose: ['9000']
+        networks:
+            static-network:
+                ipv4_address: 172.20.0.9
+        ports: ['xxx.xxx.xxx.118:10027:22']
+        volumes:
+            - /var/www/gztar.com:/var/www/gztar.com
+            - /opt/gitlab-runners/gztar/:/etc/gitlab-runner
+        restart: always
+
+    saloon-hk:
+        build: {context: ., dockerfile: config/dockerfiles/saloon-hk.conf}
+        container_name: saloon-hk
+        depends_on: [db]
+        expose: ['9000']
+        networks:
+            static-network:
+                ipv4_address: 172.20.0.10
+        ports: ['xxx.xxx.xxx.118:10028:22']
+        volumes:
+            - /var/www/c3po.pepeperadio.com:/var/www/c3po.pepeperadio.com
+            - /opt/gitlab-runners/saloon-hk/:/etc/gitlab-runner
+        restart: always
+
+    wenot:
+        build: {context: ., dockerfile: config/dockerfiles/wenot.conf}
+        container_name: wenot
+        depends_on: [db]
+        expose: ['9000']
+        networks:
+            static-network:
+                ipv4_address: 172.20.0.12
+        volumes:
+            - /var/www/wenot.pepeperadio.com:/var/www/wenot.pepeperadio.com
+            - /var/www/dev-wenot.pepeperadio.com:/var/www/dev-wenot.pepeperadio.com
+            - /opt/gitlab-runners/wenot:/etc/gitlab-runner
+        restart: always
+

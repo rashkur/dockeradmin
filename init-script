@@ -1,0 +1,34 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          sandbox
+# Required-Start:    $local_fs $remote_fs $network
+# Required-Stop:     $local_fs $remote_fs $network
+# Should-Start:
+# Should-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Starts or stops the sandbox daemon.
+# Description:       Starts and stops sandbox
+### END INIT INFO
+
+PROJECTDIR="/var/www/dockeradmin"
+GUNICORNCMD="gunicorn -b 0.0.0.0:12227 DockerAdmin.wsgi:application --timeout 120 > /var/log/dockeradmin.log 2>&1 &"
+
+function gkill {
+                for i in $(pgrep gunicorn) ; do kill -9 "$i" ; done
+        }
+
+cd "$PROJECTDIR"
+
+case "$1" in
+    start)
+        pgrep gunicorn && echo "already running" || su -c "$GUNICORNCMD" dockeradmin
+        ;;
+    stop)
+        gkill
+        ;;
+    restart)
+        gkill
+        su -c "$GUNICORNCMD" dockeradmin
+        ;;
+esac

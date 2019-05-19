@@ -1,0 +1,26 @@
+{% extends 'base.html'%}
+{% block title %}<center>Add project</center> {% endblock %}
+
+{% block content %}
+
+<a href="/e0490e9b168033bbea3db755">Back to main</a><br /><br />
+
+        {% if messages %}
+        <!--<ul class="messages">-->
+            {% for message in messages %}
+        <pre>{{ message }}</pre>
+            {% endfor %}
+        <!--</ul>-->
+        {% endif %}
+
+
+    <form action="/e0490e9b168033bbea3db755/projectadd/" method="post">
+        {% csrf_token %}
+        <input name="container" type="text" placeholder="gs" id="container"><br /><br />
+        <input name="proj_name" type="text" placeholder="newstuff.xxxxxxxxxstudio.com" id="proj_name">
+        <br /><br />
+        <input type="submit" value="Submit">
+    </form>
+
+</body>
+{% endblock %}

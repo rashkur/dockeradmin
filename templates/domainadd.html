@@ -1,0 +1,26 @@
+{% extends 'base.html'%}
+{% block title %}<center>Add Domain</center> {% endblock %}
+
+{% block content %}
+
+<a href="/e0490e9b168033bbea3db755">Back to main</a><br /><br />
+
+        {% if messages %}
+        <!--<ul class="messages">-->
+            {% for message in messages %}
+        <pre>{{ message }}</pre>
+            {% endfor %}
+        <!--</ul>-->
+        {% endif %}
+
+    <form action="/e0490e9b168033bbea3db755/domainadd/" method="post">
+        {% csrf_token %}
+        <input name="config_name" type="text" placeholder="config_name" id="config_name">.conf <br /><br />
+        <input name="domain" type="text" placeholder="some-prod.xxxxxx.com www.some-prod.xxxxx.com" id="domain" size="40"><br />
+        <br>
+        <input type="submit" value="Submit">
+    </form>
+<br><br>
+</body>
+
+{% endblock %}

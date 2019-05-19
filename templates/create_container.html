@@ -1,0 +1,27 @@
+{% extends 'base.html'%}
+{% block title %}<center>Create Container</center> {% endblock %}
+
+{% block content %}
+
+<a href="/e0490e9b168033bbea3db755">Back to main</a><br /><br />
+
+        {% if messages %}
+        <!--<ul class="messages">-->
+            {% for message in messages %}
+        <pre>{{ message }}</pre>
+            {% endfor %}
+        <!--</ul>-->
+        {% endif %}
+
+
+    <form action="/e0490e9b168033bbea3db755/create_container/" method="post">
+        {% csrf_token %}
+        <input name="container" type="text" placeholder="newcont" id="container"> <br /><br />
+        <input name="proj_name" type="text" placeholder="newproject.xxxxx.com" id="proj_name"><br /><br />
+        <input name="ip" type="text" placeholder="172.20.0..." id="ip">
+        <br> <br>
+        <input type="submit" value="Submit">
+    </form>
+
+</body>
+{% endblock %}
