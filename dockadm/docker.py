@@ -136,6 +136,10 @@ class DockerConfigurator(object):
     root /var/www/{project};
     error_log /var/log/nginx/{project}.err;
 
+    location ~ /\. {{
+         deny all;
+    }}
+    
     location / {{
         try_files $uri /index.php$is_args$args;
     }}
